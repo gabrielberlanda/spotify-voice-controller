@@ -1,0 +1,7 @@
+<resources>
+    <string name="app_name">SpotifyVoiceController</string>
+    <string name="pause">Pausar</string>
+    <string name="play">Solta o play aê</string>
+    <string name="nextTrack">Próxima musica</string>
+    <string name="previousTrack">Voltar</string>
+</resources>
