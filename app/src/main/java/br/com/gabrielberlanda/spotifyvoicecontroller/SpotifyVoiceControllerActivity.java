@@ -1,27 +1,29 @@
 package br.com.gabrielberlanda.spotifyvoicecontroller;
 
-import android.app.Notification;
+import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
+import android.content.pm.PackageManager;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
-import android.service.notification.NotificationListenerService;
+import android.support.v4.app.ActivityCompat;
+import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.os.Bundle;
-import android.util.Log;
-import android.view.View;
 import android.widget.Button;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import org.androidannotations.annotations.AfterViews;
+import org.androidannotations.annotations.Bean;
 import org.androidannotations.annotations.Click;
 import org.androidannotations.annotations.EActivity;
+import org.androidannotations.annotations.UiThread;
 import org.androidannotations.annotations.ViewById;
 
 import java.util.List;
 
 @EActivity(R.layout.activity_spotify_voice_controller)
-public class SpotifyVoiceController extends AppCompatActivity
+public class SpotifyVoiceControllerActivity extends AppCompatActivity
 {
     //    █████╗ ████████╗████████╗██████╗ ██╗██████╗ ██╗   ██╗████████╗███████╗███████╗
     //   ██╔══██╗╚══██╔══╝╚══██╔══╝██╔══██╗██║██╔══██╗██║   ██║╚══██╔══╝██╔════╝██╔════╝
@@ -29,6 +31,11 @@ public class SpotifyVoiceController extends AppCompatActivity
     //   ██╔══██║   ██║      ██║   ██╔══██╗██║██╔══██╗██║   ██║   ██║   ██╔══╝  ╚════██║
     //   ██║  ██║   ██║      ██║   ██║  ██║██║██████╔╝╚██████╔╝   ██║   ███████╗███████║
     //   ╚═╝  ╚═╝   ╚═╝      ╚═╝   ╚═╝  ╚═╝╚═╝╚═════╝  ╚═════╝    ╚═╝   ╚══════╝╚══════╝
+
+    /**
+     * Handle de solicitação de permissão
+     */
+    private static final int PERMISSIONS_REQUEST_RECORD_AUDIO = 1;
 
     /**
      *
@@ -39,6 +46,12 @@ public class SpotifyVoiceController extends AppCompatActivity
      * Spotify media controller
      */
     MediaController spotifyController;
+
+    /**
+     *
+     */
+    @Bean
+    SpotifyVoiceControllerRecognitionListener spotifyVoiceControllerRecognitionListener;
 
     /**
      *
@@ -64,6 +77,12 @@ public class SpotifyVoiceController extends AppCompatActivity
     @ViewById( R.id.previousTrackButton )
     Button previousTrackButton;
 
+    /**
+     *
+     */
+    @ViewById( R.id.messageTextView )
+    TextView message;
+
     //    ██████╗ ███╗   ██╗    ██╗███╗   ██╗██╗████████╗
     //   ██╔═══██╗████╗  ██║    ██║████╗  ██║██║╚══██╔══╝
     //   ██║   ██║██╔██╗ ██║    ██║██╔██╗ ██║██║   ██║
@@ -77,6 +96,11 @@ public class SpotifyVoiceController extends AppCompatActivity
     @AfterViews
     public void onAfterViews()
     {
+        int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO );
+        if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
+            return;
+        }
         this.checkAndSetSpotifyMediaController();
     }
 
@@ -98,7 +122,7 @@ public class SpotifyVoiceController extends AppCompatActivity
 
         for ( MediaController mediaController: mediaControllers )
         {
-            if( mediaController.getPackageName().equals( SpotifyVoiceController.SPOTIFY_PACKAGE_NAME ) )
+            if( mediaController.getPackageName().equals( br.com.gabrielberlanda.spotifyvoicecontroller.SpotifyVoiceControllerActivity.SPOTIFY_PACKAGE_NAME ) )
             {
                 this.spotifyController = mediaController;
                 Toast.makeText(this, "Media controller do spotify encontrado.", Toast.LENGTH_SHORT).show();
@@ -113,10 +137,19 @@ public class SpotifyVoiceController extends AppCompatActivity
     }
 
     /**
+     * Atualizar a mensagem da tela
+     */
+    @UiThread
+    public void updateDisplayedMessage( String message )
+    {
+        this.message.setText( message );
+    }
+
+    /**
      * Handler do evento de click no botão de tocar
      */
     @Click( R.id.playButton )
-    public void onPlayButtonClick()
+    public void onPlayTrack()
     {
         this.spotifyController.getTransportControls().play();
     }
@@ -125,7 +158,7 @@ public class SpotifyVoiceController extends AppCompatActivity
      *  Handler do evento de click no botão de pausar
      */
     @Click( R.id.pauseButton )
-    public void onPauseButtonClick()
+    public void onPauseTrack()
     {
         this.spotifyController.getTransportControls().pause();
     }
@@ -134,7 +167,7 @@ public class SpotifyVoiceController extends AppCompatActivity
      * Handler do evento de click no botão de próxima música
      */
     @Click( R.id.nextTrackButton )
-    public void onNextTrackButtonClick()
+    public void onNextTrack()
     {
         this.spotifyController.getTransportControls().skipToNext();
     }
@@ -143,9 +176,10 @@ public class SpotifyVoiceController extends AppCompatActivity
      * Handler do evento de click no botão de voltar música
      */
     @Click( R.id.previousTrackButton )
-    public void onPreviousTrackButtonClick()
+    public void onPreviousTrack()
     {
         this.spotifyController.getTransportControls().skipToPrevious();
     }
+
 }
 

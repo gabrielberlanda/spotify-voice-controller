@@ -30,4 +30,10 @@
         android:id="@+id/previousTrackButton"
         android:text="@string/previousTrack"/>
 
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/previousTrackButton"
+        android:id="@+id/messageTextView"
+        android:text=""/>
 </RelativeLayout>
