@@ -1,6 +1,8 @@
 package br.com.gabrielberlanda.spotifyvoicecontroller;
 
 import android.content.Context;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.util.Log;
 import android.widget.Toast;
 
@@ -69,22 +71,22 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
     /**
      * Comando de voz para ativar o tocar
      */
-    static final String PLAY_ACTION_VOICE_COMMAND = "play please";
+    static final String PLAY_ACTION_VOICE_COMMAND = "play";
 
     /**
      * Comando de voz para ativar o pausar
      */
-    static final String PAUSE_ACTION_VOICE_COMMAND = "pause please";
+    static final String PAUSE_ACTION_VOICE_COMMAND = "pause";
 
     /**
      * Comando de voz para ativar o próxima música
      */
-    static final String NEXT_ACTION_VOICE_COMMAND = "next please";
+    static final String NEXT_ACTION_VOICE_COMMAND = "next";
 
     /**
      * Comando de voz para ativar o voltar música
      */
-    static final String PREVIOUS_ACTION_VOICE_COMMAND = "previous please";
+    static final String PREVIOUS_ACTION_VOICE_COMMAND = "previous";
 
     //--------------------------------------------
     // Constructor
@@ -161,7 +163,7 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
         else if ( searchFor.equals( ACTIONS ) )
         {
             //Timeout de 5segundos
-            this.spotifyVoiceControllerActivity.updateDisplayedMessage( "O que vou fazer?" );
+            this.spotifyVoiceControllerActivity.updateDisplayedMessage( "O que você senhoria deseja?" );
             this.recognizer.startListening( ACTIONS, 3000 );
         }
     }
@@ -192,7 +194,7 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
     @Override
     public void onEndOfSpeech()
     {
-        Log.wtf( "RecognitionListener", "onEndOfSpeech()" );
+        Log.d( "RecognitionListener", "onEndOfSpeech()" );
         if ( !this.recognizer.getSearchName().equals( HOT_WORD ) ) this.searchForHotWord();
     }
 
@@ -209,6 +211,7 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
 
         if ( textSaid.equals( HOT_WORD_PHRASE ) )
         {
+            this.spotifyVoiceControllerActivity.emitBeep();
             this.searchForActions();
         }
         else
@@ -226,11 +229,10 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
     @Override
     public void onResult(Hypothesis hypothesis)
     {
-        Log.wtf("RecognitionListener", "onResult()");
+        Log.d("RecognitionListener", "onResult()");
         if ( hypothesis != null )
         {
             final String textSaid = hypothesis.getHypstr();
-
             this.checkForActions( textSaid );
         }
     }
@@ -240,7 +242,7 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
      */
     public void checkForActions( String whatToDo )
     {
-        Log.wtf("LOG", "Estamos buscando ação para: " + whatToDo );
+        Log.d("LOG", "Estamos buscando ação para: " + whatToDo );
 
         Boolean actionFound = false;
 
@@ -263,11 +265,13 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
                 this.spotifyVoiceControllerActivity.onPreviousTrack();
                 break;
             default:
-                Log.wtf("LOG", "Não encontramos nenhuma ação para: " + whatToDo );
+                Log.d("LOG", "Não encontramos nenhuma ação para: " + whatToDo );
         }
 
         if ( actionFound )
         {
+            this.recognizer.cancel();
+
             this.searchForHotWord();
         }
     }
@@ -279,7 +283,8 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
     @Override
     public void onError(Exception e)
     {
-        Log.wtf("RecognitionListener", "onError()");
+        Log.d("RecognitionListener", "onError()");
+
         e.printStackTrace();
     }
 
@@ -289,7 +294,7 @@ public class SpotifyVoiceControllerRecognitionListener implements RecognitionLis
     @Override
     public void onTimeout()
     {
-        Log.wtf("RecognitionListener", "onTimeout()");
+        Log.d("RecognitionListener", "onTimeout()");
         this.searchForHotWord();
     }
 

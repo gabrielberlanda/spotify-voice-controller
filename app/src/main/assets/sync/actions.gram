@@ -2,4 +2,4 @@
 
 grammar actions;
 
-public <item> = next please | previous please | play please | pause please;
+public <item> = next | previous | play | pause;

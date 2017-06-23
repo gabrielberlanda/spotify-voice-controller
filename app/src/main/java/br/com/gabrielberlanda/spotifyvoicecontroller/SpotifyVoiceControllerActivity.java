@@ -4,12 +4,16 @@ import android.Manifest;
 import android.content.ComponentName;
 import android.content.Context;
 import android.content.pm.PackageManager;
+import android.media.AudioManager;
+import android.media.ToneGenerator;
 import android.media.session.MediaController;
 import android.media.session.MediaSessionManager;
+import android.media.session.PlaybackState;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.Button;
+import android.widget.ImageButton;
 import android.widget.TextView;
 import android.widget.Toast;
 
@@ -56,26 +60,20 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
     /**
      *
      */
-    @ViewById( R.id.playButton )
-    Button playButton;
-
-    /**
-     *
-     */
-    @ViewById( R.id.pauseButton )
-    Button pauseButton;
+    @ViewById( R.id.playPauseButton )
+    ImageButton playPauseButton;
 
     /**
      *
      */
     @ViewById( R.id.nextTrackButton )
-    Button nextTrackButton;
+    ImageButton nextTrackButton;
 
     /**
      *
      */
     @ViewById( R.id.previousTrackButton )
-    Button previousTrackButton;
+    ImageButton previousTrackButton;
 
     /**
      *
@@ -96,6 +94,7 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
     @AfterViews
     public void onAfterViews()
     {
+        //TODO HANDLE PERMISSION DENIED
         int permissionCheck = ContextCompat.checkSelfPermission(getApplicationContext(), Manifest.permission.RECORD_AUDIO );
         if (permissionCheck != PackageManager.PERMISSION_GRANTED) {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.RECORD_AUDIO}, PERMISSIONS_REQUEST_RECORD_AUDIO);
@@ -127,6 +126,7 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
                 this.spotifyController = mediaController;
                 Toast.makeText(this, "Media controller do spotify encontrado.", Toast.LENGTH_SHORT).show();
                 break;
+
             }
 
             if ( this.spotifyController == null )
@@ -134,6 +134,7 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
                 this.finish();
             }
         }
+
     }
 
     /**
@@ -148,7 +149,7 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
     /**
      * Handler do evento de click no botão de tocar
      */
-    @Click( R.id.playButton )
+    /*@Click( R.id.playButton )*/
     public void onPlayTrack()
     {
         this.spotifyController.getTransportControls().play();
@@ -157,7 +158,7 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
     /**
      *  Handler do evento de click no botão de pausar
      */
-    @Click( R.id.pauseButton )
+    /*@Click( R.id.pauseButton )*/
     public void onPauseTrack()
     {
         this.spotifyController.getTransportControls().pause();
@@ -181,5 +182,32 @@ public class SpotifyVoiceControllerActivity extends AppCompatActivity
         this.spotifyController.getTransportControls().skipToPrevious();
     }
 
+    /**
+     * Handle do botão de play e pause
+     */
+    @Click( R.id.playPauseButton )
+    public void handlePlayPauseButton()
+    {
+        if ( this.spotifyController != null )
+        {
+            if ( this.spotifyController.getPlaybackState().getState() == PlaybackState.STATE_PLAYING )
+            {
+                this.onPauseTrack();
+            }
+            else
+            {
+                this.onPlayTrack();
+            }
+        }
+    }
+
+    /**
+     * BEEP , BEEP, BEEP
+     */
+    public void emitBeep()
+    {
+        ToneGenerator toneG = new ToneGenerator(AudioManager.STREAM_ALARM, 100);
+        toneG.startTone(ToneGenerator.TONE_CDMA_ALERT_CALL_GUARD, 200);
+    }
 }
 

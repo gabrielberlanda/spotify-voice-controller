@@ -5,7 +5,7 @@
     android:paddingLeft="16dp"
     android:paddingRight="16dp" >
 
-    <Button
+<!--    <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:id="@+id/pauseButton"
@@ -13,10 +13,10 @@
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/pauseButton"
         android:id="@+id/playButton"
         android:text="@string/play"
-        />
+        android:layout_below="@+id/pauseButton"
+        android:layout_alignEnd="@+id/nextTrackButton" />
     <Button
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
@@ -29,11 +29,47 @@
         android:layout_below="@id/nextTrackButton"
         android:id="@+id/previousTrackButton"
         android:text="@string/previousTrack"/>
+-->
+    <Switch
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/switchRecognitionMode"
+        android:text="Reconhecimento de Voz"
+        android:layout_above="@+id/nextTrackButton"
+        android:layout_centerHorizontal="true"
+        android:layout_marginBottom="19dp" />
+    <ImageButton
+        android:layout_width="80dp"
+        android:layout_height="120dp"
+        android:id="@+id/previousTrackButton"
+        android:src="@android:drawable/ic_media_previous"
+        android:layout_marginTop="101dp"
+        android:layout_alignParentTop="true"
+        android:layout_toStartOf="@+id/playPauseButton"
+        android:layout_marginEnd="12dp" />
+    <ImageButton
+        android:layout_width="120dp"
+        android:layout_height="80dp"
+        android:id="@+id/playPauseButton"
+        android:src="@drawable/ic_foda"
+        android:layout_marginBottom="16dp"
+        android:layout_alignBottom="@+id/previousTrackButton"
+        android:layout_centerHorizontal="true" />
+    <ImageButton
+        android:layout_width="80dp"
+        android:layout_height="120dp"
+        android:id="@+id/nextTrackButton"
+        android:src="@android:drawable/ic_media_next"
+        android:layout_alignTop="@+id/previousTrackButton"
+        android:layout_toEndOf="@+id/playPauseButton"
+        android:layout_marginStart="15dp" />
 
     <TextView
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_below="@+id/previousTrackButton"
         android:id="@+id/messageTextView"
-        android:text=""/>
+        android:text=""
+        android:layout_below="@+id/previousTrackButton"
+        android:layout_alignStart="@+id/previousTrackButton"
+        android:layout_marginTop="42dp" />
 </RelativeLayout>
